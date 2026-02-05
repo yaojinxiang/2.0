@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>常熟市空气质量预报系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>常熟市空气质量预报系统</h1>
+            <div class="header-controls">
+                <div class="update-time">
+                    <span>预报日期：</span>
+                    <input type="date" id="forecastDate" value="2026-02-04" onchange="updateForecastDate()">
+                </div>
+                <div class="filter-controls">
+                    <span class="filter-label">显示污染物：</span>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="showPM25" checked onchange="togglePollutant()">
+                        PM2.5
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="showO3" checked onchange="togglePollutant()">
+                        O3
+                    </label>
+                    <button class="btn-history" onclick="showHistoryModal()">📊 历史数据统计</button>
+                    <div class="battle-channel-dropdown-header">
+                        <button class="btn-battle-channel-header" onclick="toggleBattleChannelMenuHeader()">
+                            🎯 作战通道
+                        </button>
+                        <div class="battle-channel-menu-header" id="battleChannelMenuHeader">
+                            <a href="http://222.92.146.58:19090/clouddesk/#/login" target="_blank" class="battle-item-header battle-item-h-1">
+                                <span class="battle-icon">📊</span>
+                                <span class="battle-text">分钟数据</span>
+                            </a>
+                            <a href="http://csatmos.dbluespace.com/#/login" target="_blank" class="battle-item-header battle-item-h-2">
+                                <span class="battle-icon">🗺️</span>
+                                <span class="battle-text">作战地图</span>
+                            </a>
+                            <a href="http://61.155.4.60:28087/jiangsu/#/login" target="_blank" class="battle-item-header battle-item-h-3">
+                                <span class="battle-icon">⚠️</span>
+                                <span class="battle-text">江苏预警</span>
+                            </a>
+                            <a href="http://221.6.38.163:3040/limit/#/login" target="_blank" class="battle-item-header battle-item-h-4">
+                                <span class="battle-icon">📋</span>
+                                <span class="battle-text">限值限量</span>
+                            </a>
+                            <a href="http://www.airqualitychina.cn:9000/home" target="_blank" class="battle-item-header battle-item-h-5">
+                                <span class="battle-icon">🔲</span>
+                                <span class="battle-text">网格调度</span>
+                            </a>
+                            <a href="http://218.4.65.75:8183/cas/login?pagePublishTicket=11745b86b0f649ad89c8411e31a67f68" target="_blank" class="battle-item-header battle-item-h-6">
+                                <span class="battle-icon">🌐</span>
+                                <span class="battle-text">常熟天网</span>
+                            </a>
+                            <a href="http://oa.dbluespace.com:10800/seeyon/main.do" target="_blank" class="battle-item-header battle-item-h-7">
+                                <span class="battle-icon">📱</span>
+                                <span class="battle-text">深蓝OA</span>
+                            </a>
+                            <a href="http://czw.szgsen.com:8000/user/login" target="_blank" class="battle-item-header battle-item-h-8">
+                                <span class="battle-icon">🌊</span>
+                                <span class="battle-text">光生治污</span>
+                            </a>
+                            <a href="http://61.50.135.114:50227/" target="_blank" class="battle-item-header battle-item-h-9">
+                                <span class="battle-icon">🔬</span>
+                                <span class="battle-text">雪迪龙巡</span>
+                            </a>
+                            <a href="http://1.192.88.18:18064/#/login" target="_blank" class="battle-item-header battle-item-h-10">
+                                <span class="battle-icon">🏛️</span>
+                                <span class="battle-text">河南预警</span>
+                            </a>
+                            <div class="battle-divider"></div>
+                            <button class="battle-item-header battle-key-memo" onclick="showKeyMemoModal()">
+                                <span class="battle-icon">🔐</span>
+                                <span class="battle-text">密码备忘</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="wind-map-dropdown-header">
+                        <button class="btn-wind-map-header" onclick="toggleWindMapMenuHeader()">
+                            🌬️ 实时风场图
+                        </button>
+                        <div class="wind-map-menu-header" id="windMapMenuHeader">
+                            <a href="https://map.zq12369.com/" target="_blank" class="wind-map-item-header wind-map-zq">
+                                <span class="wind-map-icon">🗺️</span>
+                                <span class="wind-map-text">真气网</span>
+                            </a>
+                            <a href="https://airwise.hjhj-e.com/" target="_blank" class="wind-map-item-header wind-map-airwise">
+                                <span class="wind-map-icon">🌪️</span>
+                                <span class="wind-map-text">汇聚网</span>
+                            </a>
+                            <a href="https://www.windy.com/?31.309,120.602,5,m:eo0ajxK" target="_blank" class="wind-map-item-header wind-map-windy">
+                                <span class="wind-map-icon">💨</span>
+                                <span class="wind-map-text">Windy</span>
+                            </a>
+                            <a href="https://www.tropicaltidbits.com/analysis/models/?model=gfs&region=ea&pkg=T850&runtime=2023121906&fh=384" target="_blank" class="wind-map-item-header wind-map-gfs">
+                                <span class="wind-map-icon">📊</span>
+                                <span class="wind-map-text">GFS</span>
+                            </a>
+                            <a href="http://rsapp.nsmc.org.cn/geofy/?i=0&isPlay=false&speed=4&sat=fy-4b&pro=geos&type=full_disk&band=27&overlay=&x=1489077.592374346&y=3211856.3798827957&z=5&area=1&ll=0&county=0&textMarkup=1&duration=36&interval=1&c=false&cp=0.5&st=&et=&ac=320581&hide=1&s=1" target="_blank" class="wind-map-item-header wind-map-cloud">
+                                <span class="wind-map-icon">☁️</span>
+                                <span class="wind-map-text">实时云图</span>
+                            </a>
+                            <a href="https://cmdp.ncc-cma.net/cn/index.htm" target="_blank" class="wind-map-item-header wind-map-quarter">
+                                <span class="wind-map-icon">📅</span>
+                                <span class="wind-map-text">季度预测</span>
+                            </a>
+                            <a href="https://typhoon.slt.zj.gov.cn/#/" target="_blank" class="wind-map-item-header wind-map-typhoon">
+                                <span class="wind-map-icon">🌀</span>
+                                <span class="wind-map-text">台风来了</span>
+                            </a>
+                            <a href="https://tianqi.2345.com/wea_history/60038.htm" target="_blank" class="wind-map-item-header wind-map-history">
+                                <span class="wind-map-icon">📜</span>
+                                <span class="wind-map-text">历史天气</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 数据更新信息栏 -->
+        <div class="data-update-info" id="dataUpdateInfo">
+            <div class="update-info-item">
+                <span class="update-label">📊 数据来源：</span>
+                <span class="update-value" id="dataSource">中央气象台</span>
+            </div>
+            <div class="update-info-item">
+                <span class="update-label">🕐 更新时间：</span>
+                <span class="update-value" id="updateTime">2026-02-05 08:00</span>
+            </div>
+            <div class="update-info-item">
+                <span class="update-label">📅 预测周期：</span>
+                <span class="update-value" id="forecastPeriod">2月5日 - 2月11日</span>
+            </div>
+        </div>
+
+        <!-- 色阶说明 -->
+        <div class="legend-container" id="legendContainer">
+            <div class="legend-section" id="pm25Legend">
+                <h3>PM2.5 浓度色阶</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="color-box excellent"></div>
+                        <span>优 (0-35)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box good"></div>
+                        <span>良 (36-75)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box light"></div>
+                        <span>轻度 (76-115)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box moderate"></div>
+                        <span>中度 (116-150)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box heavy"></div>
+                        <span>重度 (151-250)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box severe"></div>
+                        <span>严重 (>250)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="legend-section" id="o3Legend">
+                <h3>O3 浓度色阶</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="color-box excellent"></div>
+                        <span>优 (0-50)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box good"></div>
+                        <span>良 (51-100)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box light"></div>
+                        <span>轻度 (101-160)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box moderate"></div>
+                        <span>中度 (161-215)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box heavy"></div>
+                        <span>重度 (216-265)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box severe"></div>
+                        <span>严重 (>265)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预报表格 -->
+        <div class="table-container">
+            <table class="forecast-table" id="forecastTable">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="date-header">日期</th>
+                        <th colspan="2" class="pollutant-header" id="pm25Header">PM2.5</th>
+                        <th colspan="2" class="pollutant-header" id="o3Header">O3</th>
+                        <th colspan="6" class="weather-header">气象参数</th>
+                    </tr>
+                    <tr>
+                        <th class="pollutant-subheader" id="pm25LevelHeader">等级</th>
+                        <th class="pollutant-subheader" id="pm25ValueHeader">预测浓度</th>
+                        <th class="pollutant-subheader" id="o3LevelHeader">等级</th>
+                        <th class="pollutant-subheader" id="o3ValueHeader">预测浓度</th>
+                        <th>天气</th>
+                        <th>最高温度</th>
+                        <th>风向</th>
+                        <th>风力</th>
+                        <th>湿度</th>
+                        <th>降雨量</th>
+                    </tr>
+                </thead>
+                <tbody id="forecastBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 长三角区域预测文字 -->
+        <div class="region-forecast-container">
+            <div class="section-header">
+                <h3>🗺️ 全国及重点区域空气质量形势预报 - 长三角区域</h3>
+                <span class="update-time-text">数据来源：生态环境部空气质量预报信息发布系统</span>
+            </div>
+            <div class="region-forecast-content" id="regionForecast">
+                <div class="region-forecast-text">
+                    <h4>预报提示</h4>
+                    <p><strong>2月4日</strong>，位于高压后部，区域中北部空气质量轻至中度污染，<span style="color:#d32f2f;font-weight:bold;">南部良至轻度污染</span>。</p>
+                    <p><strong>2月5日</strong>，高压后部转高压前部，区域中北部空气质量轻至中度污染，局部重度污染，<span style="color:#d32f2f;font-weight:bold;">南部良至轻度污染</span>。</p>
+                    <p><strong>2月6日</strong>，受冷空气影响，有降水，区域空气质量整体以良为主，内陆局部轻度污染。</p>
+                    <p><strong>2月7日</strong>，受冷空气影响转高压底部，区域空气质量整体以良为主，内陆局部轻度污染。</p>
+                    <p><strong>2月8日</strong>，位于高压底部，区域空气质量整体以良为主，内陆局部轻度污染。</p>
+                    <p><strong>2月9—10日</strong>，位于高压后部，区域空气质量整体以良为主，内陆局部轻度污染。</p>
+                    <p class="primary-pollutant"><strong>首要污染物为PM₂.₅或PM₁₀。</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 未来3天预测文字描述 -->
+        <div class="forecast-description-container">
+            <div class="section-header">
+                <h3>📝 常熟市空气质量预报分析</h3>
+                <span class="update-time-text">基于中央气象台和生态环境部数据</span>
+            </div>
+            <div class="forecast-text-content" id="forecastDescription">
+                <!-- 动态生成的预测文字将插入这里 -->
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="saveData()">保存数据</button>
+            <button class="btn btn-secondary" onclick="loadDefaultData()">加载默认数据</button>
+            <button class="btn btn-info" onclick="exportData()">导出数据</button>
+            <button class="btn btn-warning" onclick="refreshAllData()">🔄 刷新天气数据</button>
+        </div>
+
+        <!-- Meteoblue 7天预测图 -->
+        <div class="chart-container" style="margin-bottom: 30px;">
+            <div class="chart-header">
+                <h3>🌤️ Meteoblue 7天天气预报图</h3>
+                <a href="https://www.meteoblue.com/en/weather/forecast/meteogramweb/changshu-shi_china_1881767"
+                   target="_blank"
+                   class="btn-refresh-chart">
+                    打开完整图表 ↗
+                </a>
+            </div>
+            <div class="chart-content" id="meteoblueChart">
+                <div class="chart-notice">
+                    <h4 style="color: #1976d2; margin-bottom: 10px;">📊 Meteoblue 7天天气预报</h4>
+                    <p style="margin: 8px 0; color: #1976d2;">
+                        点击下方按钮查看常熟市详细的气象预报图表（温度、降水、风速、风向、湿度等综合气象信息）
+                    </p>
+                    <a href="https://www.meteoblue.com/en/weather/forecast/meteogramweb/changshu-shi_china_1881767"
+                       target="_blank"
+                       class="btn btn-info"
+                       style="margin-top: 15px; display: inline-block;">
+                        查看 Meteoblue 气象图
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中央气象台图表 -->
+        <div class="nmc-charts-container">
+            <div class="chart-row">
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <h3>🌫️ 霾预报图</h3>
+                        <a href="https://www.nmc.cn/publish/haze.html" target="_blank" class="btn-refresh-chart">打开完整图表 ↗</a>
+                    </div>
+                    <div class="chart-content" style="padding: 30px; text-align: center;">
+                        <div class="chart-notice" style="background: #fff3e0; border-left-color: #ff9800;">
+                            <h4 style="color: #e65100; margin-bottom: 10px;">🌫️ 中央气象台霾预报</h4>
+                            <p style="margin: 8px 0; color: #e65100;">
+                                查看全国霾预报分布图，了解常熟市及周边地区霾天气情况
+                            </p>
+                            <a href="https://www.nmc.cn/publish/haze.html" target="_blank" class="btn btn-warning" style="margin-top: 15px; display: inline-block;">
+                                查看霾预报图
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <h3>💨 空气污染气象条件预报图</h3>
+                        <a href="https://www.nmc.cn/publish/environment/air_pollution-24.html" target="_blank" class="btn-refresh-chart">打开完整图表 ↗</a>
+                    </div>
+                    <div class="chart-content" style="padding: 30px; text-align: center;">
+                        <div class="chart-notice" style="background: #e3f2fd; border-left-color: #2196f3;">
+                            <h4 style="color: #1976d2; margin-bottom: 10px;">💨 空气污染气象条件预报</h4>
+                            <p style="margin: 8px 0; color: #1976d2;">
+                                查看空气污染气象条件等级预报，了解污染物扩散条件
+                            </p>
+                            <a href="https://www.nmc.cn/publish/environment/air_pollution-24.html" target="_blank" class="btn btn-info" style="margin-top: 15px; display: inline-block;">
+                                查看气象条件预报图
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 沙尘天气预报 -->
+            <div class="chart-row" style="margin-top: 20px;">
+                <div class="chart-box" style="grid-column: 1 / -1;">
+                    <div class="chart-header">
+                        <h3>🌪️ 沙尘天气预报</h3>
+                        <a href="https://www.nmc.cn/publish/severeweather/dust.html" target="_blank" class="btn-refresh-chart">打开完整图表 ↗</a>
+                    </div>
+                    <div class="chart-content" style="padding: 30px; text-align: center;">
+                        <div class="chart-notice" style="background: #fff3e0; border-left-color: #ff9800;">
+                            <h4 style="color: #e65100; margin-bottom: 10px;">🌪️ 中央气象台沙尘天气预报</h4>
+                            <p style="margin: 8px 0; color: #e65100;">
+                                查看全国沙尘天气预报分布图，了解沙尘天气发生发展态势
+                            </p>
+                            <a href="https://www.nmc.cn/publish/severeweather/dust.html" target="_blank" class="btn btn-warning" style="margin-top: 15px; display: inline-block;">
+                                查看沙尘天气预报图
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 密码备忘录模态框 -->
+    <div class="modal-overlay" id="keyMemoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔐 账号密码备忘录</h3>
+                <button class="modal-close" onclick="closeKeyMemoModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="password-verify" id="passwordVerify">
+                    <div class="verify-box">
+                        <span class="verify-icon">🔒</span>
+                        <p class="verify-text">请输入访问密码查看账号信息</p>
+                        <input type="password" id="memoPassword" class="verify-input" placeholder="请输入密码" maxlength="20">
+                        <button class="btn-verify" onclick="verifyMemoPassword()">验证</button>
+                    </div>
+                </div>
+                <div class="password-content" id="passwordContent" style="display: none;">
+                    <div class="memo-actions">
+                        <button class="btn btn-primary" onclick="enableMemoEdit()">编辑</button>
+                        <button class="btn btn-success" onclick="saveMemoData()" id="saveMemoBtn" style="display: none;">保存</button>
+                        <button class="btn btn-secondary" onclick="cancelMemoEdit()" id="cancelMemoBtn" style="display: none;">取消</button>
+                    </div>
+                    <div class="memo-table-container">
+                        <table class="memo-table" id="memoTable">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>系统名称</th>
+                                    <th>账号</th>
+                                    <th>密码</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memoTableBody">
+                                <!-- 动态生成的密码数据 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史数据统计模态框 -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 历史预测数据统计</h3>
+                <button class="modal-close" onclick="closeHistoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="history-table-container">
+                    <table class="history-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>天气</th>
+                                <th>预测PM2.5</th>
+                                <th>实际PM2.5</th>
+                                <th>预测O3</th>
+                                <th>实际O3</th>
+                                <th>最高温度</th>
+                                <th>风向</th>
+                                <th>降雨量</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- 动态生成的历史数据 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="history-actions">
+                    <button class="btn btn-primary" onclick="exportHistoryData()">导出历史数据</button>
+                    <button class="btn btn-secondary" onclick="clearHistoryData()">清空历史数据</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // 确保全局函数可用
+        window.showHistoryModal = showHistoryModal;
+        window.closeHistoryModal = closeHistoryModal;
+        window.updateForecastDate = updateForecastDate;
+        window.refreshAllData = refreshAllData;
+        window.exportHistoryData = exportHistoryData;
+        window.clearHistoryData = clearHistoryData;
+        window.toggleWindMapMenuHeader = toggleWindMapMenuHeader;
+        window.toggleBattleChannelMenuHeader = toggleBattleChannelMenuHeader;
+        window.showKeyMemoModal = showKeyMemoModal;
+        window.closeKeyMemoModal = closeKeyMemoModal;
+        window.verifyMemoPassword = verifyMemoPassword;
+        window.enableMemoEdit = enableMemoEdit;
+        window.saveMemoData = saveMemoData;
+        window.cancelMemoEdit = cancelMemoEdit;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1653 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #667eea;
+}
+
+.header h1 {
+    color: #333;
+    font-size: 32px;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.update-time {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+    font-size: 16px;
+}
+
+.update-time input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 150px;
+    background: #f9f9f9;
+}
+
+.update-time input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+}
+
+/* 筛选控制 */
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f8f9fa;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.filter-label {
+    font-size: 15px;
+    color: #555;
+    font-weight: 600;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    padding: 5px 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.filter-checkbox:hover {
+    border-color: #667eea;
+    background: #f5f5f5;
+}
+
+.filter-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+/* 色阶说明 */
+.legend-container {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.legend-section {
+    background: #f8f9fa;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.legend-section h3 {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.legend-items {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.color-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.color-box.excellent {
+    background: #00e400;
+}
+
+.color-box.good {
+    background: #ffff00;
+}
+
+.color-box.light {
+    background: #ff7e00;
+}
+
+.color-box.moderate {
+    background: #ff0000;
+}
+
+.color-box.heavy {
+    background: #99004c;
+}
+
+.color-box.severe {
+    background: #7e0023;
+}
+
+/* 数据更新信息栏 */
+.data-update-info {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    padding: 15px 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    flex-wrap: wrap;
+}
+
+.update-info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.update-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.update-value {
+    font-size: 14px;
+    color: #1976d2;
+    font-weight: 600;
+}
+
+/* 表格容器 */
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.forecast-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.forecast-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.forecast-table th {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 15px 12px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pollutant-header {
+    background: rgba(255, 152, 0, 0.9) !important;
+}
+
+.weather-header {
+    background: rgba(33, 150, 243, 0.9) !important;
+}
+
+.pollutant-subheader {
+    font-size: 13px;
+    background: rgba(255, 152, 0, 0.7) !important;
+}
+
+.forecast-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.forecast-table tbody tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.forecast-table tbody tr:hover {
+    background: #e8eaf6;
+    transform: scale(1.01);
+}
+
+.forecast-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    font-size: 15px;
+    color: #333;
+}
+
+/* 可编辑单元格样式 */
+.editable {
+    background: #fff;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+}
+
+.editable:hover {
+    border-color: #667eea;
+    background: #f5f5f5;
+}
+
+.editable:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* 污染物浓度背景色 */
+.pm25-excellent {
+    background-color: #e8f5e9 !important;
+}
+
+.pm25-good {
+    background-color: #fffde7 !important;
+}
+
+.pm25-light {
+    background-color: #fff3e0 !important;
+}
+
+.pm25-moderate {
+    background-color: #ffebee !important;
+}
+
+.pm25-heavy {
+    background-color: #f3e5f5 !important;
+}
+
+.pm25-severe {
+    background-color: #fce4ec !important;
+}
+
+.pm25-mixed {
+    background: linear-gradient(135deg, #fffde7 50%, #fff3e0 50%) !important;
+}
+
+/* 优-良混合 (如30-40，跨越35边界) */
+.pm25-excellent-good {
+    background: linear-gradient(135deg, #e8f5e9 50%, #fffde7 50%) !important;
+}
+
+/* 良-轻度混合 (如70-80，跨越75边界) */
+.pm25-good-light {
+    background: linear-gradient(135deg, #fffde7 50%, #fff3e0 50%) !important;
+}
+
+/* 轻度-中度混合 (如110-120，跨越115边界) */
+.pm25-light-moderate {
+    background: linear-gradient(135deg, #fff3e0 50%, #ffebee 50%) !important;
+}
+
+/* 中度-重度混合 (如145-155，跨越150边界) */
+.pm25-moderate-heavy {
+    background: linear-gradient(135deg, #ffebee 50%, #f3e5f5 50%) !important;
+}
+
+/* 重度-严重混合 (如245-255，跨越250边界) */
+.pm25-heavy-severe {
+    background: linear-gradient(135deg, #f3e5f5 50%, #fce4ec 50%) !important;
+}
+
+.pm25-unknown {
+    background-color: #f5f5f5 !important;
+}
+
+.o3-excellent {
+    background-color: #e8f5e9 !important;
+}
+
+.o3-good {
+    background-color: #fffde7 !important;
+}
+
+.o3-light {
+    background-color: #fff3e0 !important;
+}
+
+.o3-moderate {
+    background-color: #ffebee !important;
+}
+
+.o3-heavy {
+    background-color: #f3e5f5 !important;
+}
+
+.o3-severe {
+    background-color: #fce4ec !important;
+}
+
+/* 日期列样式 */
+.date-cell {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 15px;
+}
+
+/* 等级单元格样式 */
+.level-cell {
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 60px;
+}
+
+.level-text {
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.pm25-level-cell,
+.o3-level-cell {
+    text-align: center;
+}
+
+.pm25-value-cell,
+.o3-value-cell {
+    min-width: 80px;
+}
+
+/* 风向输入框 */
+.wind-direction-input {
+    min-width: 120px;
+    width: 120px;
+}
+
+/* 风力输入框 */
+.wind-level-input {
+    min-width: 60px;
+    width: 60px;
+    text-align: center;
+}
+
+/* 风力单元格 */
+.wind-level-cell {
+    text-align: center;
+    min-width: 70px;
+}
+
+/* 风向风力合并输入框 */
+.wind-input {
+    min-width: 120px;
+    text-align: center;
+}
+
+/* 温度单元格样式 */
+.temp-high-cell {
+    color: #d32f2f;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.temp-input {
+    width: 50px;
+    text-align: center;
+    font-size: 15px;
+    border: none;
+    background: transparent;
+    font-weight: bold;
+    color: #d32f2f;
+}
+
+.temp-input:focus {
+    background: #fff;
+    border: 2px solid #667eea;
+    border-radius: 4px;
+}
+
+/* 天气图标单元格 */
+.weather-icon-cell {
+    text-align: center;
+    padding: 8px 4px !important;
+    min-width: 80px;
+}
+
+.weather-icon {
+    display: block;
+    font-size: 28px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.weather-icon:hover {
+    transform: scale(1.2);
+}
+
+.weather-select {
+    width: 80px;
+    font-size: 11px;
+    padding: 2px 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+    cursor: pointer;
+}
+
+.weather-select:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+}
+
+/* 降雨量输入框 */
+.rainfall-input {
+    width: 60px;
+    text-align: center;
+}
+
+/* 湿度输入框 */
+.humidity-input {
+    width: 50px;
+    text-align: center;
+}
+
+/* 隐藏温度、湿度、降雨量输入框的加减按钮 */
+.temp-input::-webkit-outer-spin-button,
+.temp-input::-webkit-inner-spin-button,
+.humidity-input::-webkit-outer-spin-button,
+.humidity-input::-webkit-inner-spin-button,
+.rainfall-input::-webkit-outer-spin-button,
+.rainfall-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.temp-input[type=number],
+.humidity-input[type=number],
+.rainfall-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* PM2.5区间输入框 */
+.pm25-input {
+    width: 90px;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* O3输入框 */
+.o3-input {
+    width: 60px;
+    text-align: center;
+}
+
+/* 等级单元格 */
+.level-cell {
+    min-width: 50px;
+    font-weight: bold;
+}
+
+.level-text {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.5);
+}
+
+/* 日期单元格 */
+.date-cell {
+    min-width: 70px;
+    font-weight: 600;
+    color: #667eea;
+}
+
+/* 操作按钮 */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.btn {
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+/* 数据来源说明 */
+.data-source {
+    background: #f8f9fa;
+    padding: 20px 30px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+    margin-bottom: 30px;
+}
+
+.data-source h3 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.data-source ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.data-source li {
+    padding: 8px 0;
+    color: #666;
+    font-size: 14px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.data-source li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 1;
+}
+
+/* 图表容器 */
+.chart-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.chart-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-refresh-chart {
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-refresh-chart:hover {
+    background: #f5f5f5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chart-content {
+    padding: 30px;
+    min-height: 200px;
+}
+
+.chart-notice {
+    padding: 20px 30px;
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    border-radius: 4px;
+}
+
+.chart-notice p {
+    margin: 8px 0;
+    color: #1976d2;
+    font-size: 14px;
+}
+
+.chart-notice a {
+    color: #1976d2;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.chart-notice a:hover {
+    color: #0d47a1;
+}
+
+/* 预报描述容器 */
+.forecast-description-container,
+.region-forecast-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+    color: white;
+}
+
+.section-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.update-time-text {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.forecast-text-content,
+.region-forecast-content {
+    padding: 25px 30px;
+}
+
+.forecast-text-section h4,
+.region-forecast-text h4 {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.forecast-day-text {
+    line-height: 1.8;
+    margin-bottom: 15px;
+    text-align: justify;
+    color: #444;
+}
+
+.forecast-day-text strong {
+    color: #2e7d32;
+}
+
+.forecast-summary {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f1f8e9;
+    border-left: 4px solid #43a047;
+    border-radius: 4px;
+    line-height: 1.6;
+}
+
+.forecast-summary strong {
+    color: #2e7d32;
+}
+
+.region-forecast-text p {
+    line-height: 1.8;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.primary-pollutant {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #fff3e0;
+    border-left: 4px solid #ff9800;
+    border-radius: 4px;
+}
+
+.primary-pollutant strong {
+    color: #e65100;
+}
+
+/* 中央气象台图表容器 */
+.nmc-charts-container {
+    margin-bottom: 30px;
+}
+
+.chart-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.chart-box {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.chart-box .chart-header {
+    background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+}
+
+.chart-box .chart-content {
+    padding: 20px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nmc-chart-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.chart-fallback {
+    text-align: center;
+    padding: 30px;
+}
+
+.chart-fallback p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.chart-link {
+    color: #5c6bc0;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.btn-view-full {
+    padding: 6px 16px;
+    font-size: 13px;
+    background: white;
+    color: #5c6bc0;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.btn-view-full:hover {
+    background: #f5f5f5;
+}
+
+/* 历史统计按钮 */
+.btn-history {
+    padding: 8px 16px;
+    font-size: 14px;
+    background: linear-gradient(135deg, #ff7043 0%, #f4511e 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 15px;
+}
+
+.btn-history:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 顶部作战通道下拉菜单 */
+.battle-channel-dropdown-header {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-battle-channel-header {
+    padding: 8px 16px;
+    font-size: 14px;
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+.btn-battle-channel-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(67, 160, 71, 0.3);
+}
+
+.battle-channel-menu-header {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 180px;
+    margin-top: 10px;
+    z-index: 1000;
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.battle-channel-menu-header.show {
+    display: block;
+    animation: fadeInDown 0.3s ease;
+}
+
+.battle-channel-menu-header::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+}
+
+.battle-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    margin-bottom: 6px;
+}
+
+.battle-item-header:last-of-type {
+    margin-bottom: 0;
+}
+
+.battle-item-header:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 顶部作战通道 - 10个不同颜色 */
+.battle-item-h-1 { background: linear-gradient(135deg, #ef5350 0%, #c62828 100%); }
+.battle-item-h-1:hover { background: linear-gradient(135deg, #e57373 0%, #ef5350 100%); }
+
+.battle-item-h-2 { background: linear-gradient(135deg, #ff7043 0%, #d84315 100%); }
+.battle-item-h-2:hover { background: linear-gradient(135deg, #ff8a65 0%, #ff7043 100%); }
+
+.battle-item-h-3 { background: linear-gradient(135deg, #ffa726 0%, #ef6c00 100%); }
+.battle-item-h-3:hover { background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%); }
+
+.battle-item-h-4 { background: linear-gradient(135deg, #ffca28 0%, #f9a825 100%); color: #333; }
+.battle-item-h-4:hover { background: linear-gradient(135deg, #ffe082 0%, #ffca28 100%); }
+
+.battle-item-h-5 { background: linear-gradient(135deg, #9ccc65 0%, #558b2f 100%); }
+.battle-item-h-5:hover { background: linear-gradient(135deg, #aed581 0%, #9ccc65 100%); }
+
+.battle-item-h-6 { background: linear-gradient(135deg, #26a69a 0%, #00695c 100%); }
+.battle-item-h-6:hover { background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%); }
+
+.battle-item-h-7 { background: linear-gradient(135deg, #42a5f5 0%, #1565c0 100%); }
+.battle-item-h-7:hover { background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%); }
+
+.battle-item-h-8 { background: linear-gradient(135deg, #5c6bc0 0%, #283593 100%); }
+.battle-item-h-8:hover { background: linear-gradient(135deg, #7986cb 0%, #5c6bc0 100%); }
+
+.battle-item-h-9 { background: linear-gradient(135deg, #7e57c2 0%, #4527a0 100%); }
+.battle-item-h-9:hover { background: linear-gradient(135deg, #9575cd 0%, #7e57c2 100%); }
+
+.battle-item-h-10 { background: linear-gradient(135deg, #ec407a 0%, #ad1457 100%); }
+.battle-item-h-10:hover { background: linear-gradient(135deg, #f06292 0%, #ec407a 100%); }
+
+.battle-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 8px 0;
+}
+
+.battle-key-memo {
+    background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.battle-key-memo:hover {
+    background: linear-gradient(135deg, #ba68c8 0%, #ab47bc 100%);
+}
+
+/* 作战通道下拉菜单 */
+.battle-channel-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-battle-channel {
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(67, 160, 71, 0.3);
+}
+
+.btn-battle-channel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(67, 160, 71, 0.4);
+}
+
+.battle-channel-menu {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 200px;
+    margin-bottom: 10px;
+    z-index: 1001;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.battle-channel-menu.show {
+    display: block;
+    animation: fadeInUp 0.3s ease;
+}
+
+.battle-channel-menu::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 30px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+}
+
+.battle-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    margin-bottom: 6px;
+}
+
+.battle-item:last-child {
+    margin-bottom: 0;
+}
+
+.battle-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 作战通道 - 10个不同颜色 */
+.battle-item-1 { background: linear-gradient(135deg, #ef5350 0%, #c62828 100%); }
+.battle-item-1:hover { background: linear-gradient(135deg, #e57373 0%, #ef5350 100%); }
+
+.battle-item-2 { background: linear-gradient(135deg, #ff7043 0%, #d84315 100%); }
+.battle-item-2:hover { background: linear-gradient(135deg, #ff8a65 0%, #ff7043 100%); }
+
+.battle-item-3 { background: linear-gradient(135deg, #ffa726 0%, #ef6c00 100%); }
+.battle-item-3:hover { background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%); }
+
+.battle-item-4 { background: linear-gradient(135deg, #ffca28 0%, #f9a825 100%); color: #333; }
+.battle-item-4:hover { background: linear-gradient(135deg, #ffe082 0%, #ffca28 100%); }
+
+.battle-item-5 { background: linear-gradient(135deg, #9ccc65 0%, #558b2f 100%); }
+.battle-item-5:hover { background: linear-gradient(135deg, #aed581 0%, #9ccc65 100%); }
+
+.battle-item-6 { background: linear-gradient(135deg, #26a69a 0%, #00695c 100%); }
+.battle-item-6:hover { background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%); }
+
+.battle-item-7 { background: linear-gradient(135deg, #42a5f5 0%, #1565c0 100%); }
+.battle-item-7:hover { background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%); }
+
+.battle-item-8 { background: linear-gradient(135deg, #5c6bc0 0%, #283593 100%); }
+.battle-item-8:hover { background: linear-gradient(135deg, #7986cb 0%, #5c6bc0 100%); }
+
+.battle-item-9 { background: linear-gradient(135deg, #7e57c2 0%, #4527a0 100%); }
+.battle-item-9:hover { background: linear-gradient(135deg, #9575cd 0%, #7e57c2 100%); }
+
+.battle-item-10 { background: linear-gradient(135deg, #ec407a 0%, #ad1457 100%); }
+.battle-item-10:hover { background: linear-gradient(135deg, #f06292 0%, #ec407a 100%); }
+
+.battle-icon {
+    font-size: 16px;
+}
+
+.battle-text {
+    flex: 1;
+}
+
+/* 密码备忘录样式 */
+.password-verify {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.verify-box {
+    text-align: center;
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+}
+
+.verify-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.verify-text {
+    font-size: 16px;
+    color: #6a1b9a;
+    margin-bottom: 24px;
+    font-weight: 500;
+}
+
+.verify-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 16px;
+    border: 2px solid #ce93d8;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.verify-input:focus {
+    border-color: #8e24aa;
+    box-shadow: 0 0 0 3px rgba(142, 36, 170, 0.2);
+}
+
+.btn-verify {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-verify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(142, 36, 170, 0.3);
+}
+
+.verify-hint {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #9e9e9e;
+}
+
+.memo-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: flex-end;
+}
+
+.memo-table-container {
+    overflow-x: auto;
+}
+
+.memo-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.memo-table th {
+    background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+    color: white;
+    padding: 14px 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.memo-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.memo-table tr:nth-child(even) {
+    background: #f3e5f5;
+}
+
+.memo-table tr:hover {
+    background: #e1bee7;
+}
+
+.memo-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid #ce93d8;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+.memo-input:focus {
+    border-color: #8e24aa;
+}
+
+/* 表头实时风场图下拉菜单 */
+.wind-map-dropdown-header {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-wind-map-header {
+    padding: 8px 16px;
+    font-size: 14px;
+    background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+.btn-wind-map-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+}
+
+.wind-map-menu-header {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 160px;
+    margin-top: 10px;
+    z-index: 1000;
+}
+
+.wind-map-menu-header.show {
+    display: block;
+    animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.wind-map-menu-header::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+}
+
+.wind-map-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    margin-bottom: 6px;
+}
+
+.wind-map-item-header:last-child {
+    margin-bottom: 0;
+}
+
+.wind-map-item-header:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 真气网 - 绿色系 */
+.wind-map-zq {
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+}
+
+.wind-map-zq:hover {
+    background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+}
+
+/* 汇聚网 - 橙色系 */
+.wind-map-airwise {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.wind-map-airwise:hover {
+    background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+}
+
+/* Windy - 蓝色系 */
+.wind-map-windy {
+    background: linear-gradient(135deg, #29b6f6 0%, #0288d1 100%);
+}
+
+.wind-map-windy:hover {
+    background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+}
+
+/* GFS - 紫色系 */
+.wind-map-gfs {
+    background: linear-gradient(135deg, #7e57c2 0%, #512da8 100%);
+}
+
+.wind-map-gfs:hover {
+    background: linear-gradient(135deg, #9575cd 0%, #7e57c2 100%);
+}
+
+/* 实时云图 - 青灰系 */
+.wind-map-cloud {
+    background: linear-gradient(135deg, #78909c 0%, #455a64 100%);
+}
+
+.wind-map-cloud:hover {
+    background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%);
+}
+
+/* 季度预测 - 深绿系 */
+.wind-map-quarter {
+    background: linear-gradient(135deg, #43a047 0%, #1b5e20 100%);
+}
+
+.wind-map-quarter:hover {
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+}
+
+/* 台风来了 - 红色系 */
+.wind-map-typhoon {
+    background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+}
+
+.wind-map-typhoon:hover {
+    background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
+}
+
+/* 历史天气 - 棕色系 */
+.wind-map-history {
+    background: linear-gradient(135deg, #8d6e63 0%, #5d4037 100%);
+}
+
+.wind-map-history:hover {
+    background: linear-gradient(135deg, #a1887f 0%, #8d6e63 100%);
+}
+
+/* 模态框样式 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 25px 30px;
+    overflow-y: auto;
+    max-height: calc(85vh - 80px);
+}
+
+.history-table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th {
+    background: #f5f5f5;
+    padding: 12px 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+}
+
+.history-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.history-table tr:hover {
+    background: #f9f9f9;
+}
+
+.weather-icon-small {
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.actual-value {
+    background: #fff8e1;
+}
+
+.actual-input {
+    width: 70px;
+    text-align: center;
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+.actual-input:focus {
+    background: white;
+    border-color: #667eea;
+    outline: none;
+}
+
+.history-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+/* 实际浓度单元格样式 */
+.pm25-actual-cell,
+.o3-actual-cell {
+    background: #fff8e1;
+    min-width: 90px;
+}
+
+.actual-pm25-input,
+.actual-o3-input {
+    width: 80px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .chart-row {
+        grid-template-columns: 1fr;
+    }
+
+    .header-controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .container {
+        padding: 20px;
+    }
+
+    .forecast-table td,
+    .forecast-table th {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+
+    .editable {
+        font-size: 13px;
+        padding: 5px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .legend-container {
+        flex-direction: column;
+    }
+
+    .legend-items {
+        gap: 10px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+/* 提示消息 */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #333;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast.success {
+    background: #4caf50;
+}
+
+.toast.error {
+    background: #f44336;
+}
+
+.toast.info {
+    background: #2196f3;
+}
