@@ -264,6 +264,7 @@
             <button class="btn btn-secondary" onclick="loadDefaultData()">加载默认数据</button>
             <button class="btn btn-info" onclick="exportData()">导出数据</button>
             <button class="btn btn-warning" onclick="refreshAllData()">🔄 刷新天气数据</button>
+            <button class="btn btn-danger" onclick="clearCacheAndReload()">🗑️ 清除缓存</button>
         </div>
 
         <!-- Meteoblue 7天预测图 -->
@@ -440,6 +441,9 @@
         window.refreshAllData = refreshAllData;
         window.exportHistoryData = exportHistoryData;
         window.clearHistoryData = clearHistoryData;
+        window.clearCacheAndReload = clearCacheAndReload;
+        window.fetchFromCMAAPI = fetchFromCMAAPI;
+        window.useLocalFallbackData = useLocalFallbackData;
         window.toggleWindMapMenuHeader = toggleWindMapMenuHeader;
         window.toggleBattleChannelMenuHeader = toggleBattleChannelMenuHeader;
         window.showKeyMemoModal = showKeyMemoModal;

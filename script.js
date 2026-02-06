@@ -138,13 +138,25 @@ function updateDataInfoDisplay() {
     if (dataSourceEl) dataSourceEl.textContent = dataUpdateSource;
     if (updateTimeEl) updateTimeEl.textContent = lastDataUpdateTime;
     
-    // 计算预测周期
+    // 计算预测周期（根据实际显示的数据，即过滤后的数据）
     if (currentTableData.length > 0) {
-        const startDate = new Date(currentTableData[0].date);
-        const endDate = new Date(currentTableData[currentTableData.length - 1].date);
-        const formatDateCN = (date) => `${date.getMonth() + 1}月${date.getDate()}日`;
-        if (forecastPeriodEl) {
-            forecastPeriodEl.textContent = `${formatDateCN(startDate)} - ${formatDateCN(endDate)}`;
+        // 应用与initTable相同的过滤逻辑
+        const forecastDateObj = new Date(currentForecastDate);
+        forecastDateObj.setHours(0, 0, 0, 0);
+        
+        const filteredData = currentTableData.filter(row => {
+            const rowDate = new Date(row.date);
+            rowDate.setHours(0, 0, 0, 0);
+            return rowDate >= forecastDateObj;
+        });
+        
+        if (filteredData.length > 0) {
+            const startDate = new Date(filteredData[0].date);
+            const endDate = new Date(filteredData[filteredData.length - 1].date);
+            const formatDateCN = (date) => `${date.getMonth() + 1}月${date.getDate()}日`;
+            if (forecastPeriodEl) {
+                forecastPeriodEl.textContent = `${formatDateCN(startDate)} - ${formatDateCN(endDate)}`;
+            }
         }
     }
 }
@@ -365,6 +377,9 @@ function verifyDataConsistency(tableData, nmcData) {
 
 // 自动修正数据以匹配中央气象台数据
 function autoCorrectData(tableData, nmcData) {
+    console.log('[autoCorrectData] 开始数据修正...');
+    console.log('[autoCorrectData] NMC数据:', nmcData.map(d => ({date: d.date, weather: d.weather, wind: d.windDirection + d.windLevel})));
+    
     const correctedData = tableData.map((row, index) => {
         if (index < nmcData.length) {
             const nmcRow = nmcData[index];
@@ -375,8 +390,8 @@ function autoCorrectData(tableData, nmcData) {
             corrected.windLevel = nmcRow.windLevel;
             corrected.windDirection = nmcRow.windDirection;
             corrected.weather = nmcRow.weather;
-            corrected.rainfall = nmcRow.rainfall;
-            corrected.humidity = nmcRow.humidity;
+            corrected.rainfall = nmcRow.rainfall !== undefined ? nmcRow.rainfall : row.rainfall;
+            corrected.humidity = nmcRow.humidity !== undefined ? nmcRow.humidity : row.humidity;
 
             // 根据长三角规则和气象条件重新计算PM2.5
             const basePM25 = yangtzeRiverDeltaRules[row.date]?.basePM25 || 50;
@@ -387,17 +402,55 @@ function autoCorrectData(tableData, nmcData) {
                 corrected.windLevel,
                 corrected.rainfall
             );
+            
+            console.log(`[autoCorrectData] ${row.date}: ${row.weather}(${row.windDirection}) -> ${corrected.weather}(${corrected.windDirection})`);
 
             return corrected;
         }
         return row;
     });
-
+    
+    console.log('[autoCorrectData] 修正完成');
     return correctedData;
 }
 
-// 当前表格数据（用于动态更新）
+// 清除缓存并强制重新加载数据
+function clearCacheAndReload() {
+    console.log('[CLEAR CACHE] 清除所有缓存数据...');
+    
+    // 清除localStorage
+    localStorage.removeItem('forecastData');
+    localStorage.removeItem('forecastHistoryData');
+    
+    // 重置为默认数据
+    const defaultDataCopy = getDefaultDataCopy();
+    currentTableData = defaultDataCopy.map(row => ({
+        ...row,
+        pm25: calculatePM25WithRules(
+            row.date,
+            yangtzeRiverDeltaRules[row.date]?.basePM25 || row.pm25,
+            row.weather,
+            row.windLevel,
+            row.rainfall
+        )
+    }));
+    
+    initTable();
+    generateForecastDescription();
+    
+    showToast('缓存已清除，正在重新获取数据...', 'info');
+    
+    // 重新获取数据
+    setTimeout(() => refreshAllData(), 500);
+}
+
+// 当前表格数据（用于动态更新）- 使用深拷贝防止修改原始数据
 let currentTableData = JSON.parse(JSON.stringify(defaultData));
+
+// 获取原始默认数据的深拷贝（用于重置）
+function getDefaultDataCopy() {
+    return JSON.parse(JSON.stringify(defaultData));
+}
 
 // 分析三天整体趋势（用于空气质量分析）
 function analyzeThreeDayTrend(days) {
@@ -2192,79 +2245,31 @@ function formatDateText(dateStr) {
     return `${month}月${day}日`;
 }
 
-// 统一的刷新函数 - 从中央气象台API获取数据（带数据核查和自动修正）
+// 统一的刷新函数 - 从中央气象台API获取数据（纯前端实现，支持GitHub Pages）
 async function refreshAllData() {
     showToast("正在获取最新气象数据...", "info");
 
     try {
-        // 调用后端API获取中央气象台数据，传递当前预测日期
-        const startDate = currentTableData[0]?.date || currentForecastDate;
+        // 【纯前端实现】直接调用CMA官方API，无需后端
+        const cmaData = await fetchFromCMAAPI();
         
-        // 添加时间戳避免缓存
-        const timestamp = new Date().getTime();
-        
-        // 设置超时
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
-        
-        const response = await fetch(`/api/weather/nmc?start_date=${startDate}&_t=${timestamp}&force=true`, {
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-            throw new Error('获取数据失败');
-        }
-
-        const result = await response.json();
-        console.log('API返回结果:', result);
-
-        if (result.success && result.data) {
-            const nmcData = result.data;
-            const dataSource = result.source || 'unknown';
+        if (cmaData && cmaData.length >= 3) {
+            console.log('[OK] 从CMA API获取数据成功:', cmaData);
             
-            console.log('数据源:', dataSource);
-            console.log('返回数据:', nmcData);
-            
-            // 根据数据源设置不同的提示
-            let sourceName = "中央气象台";
-            if (dataSource === 'mock' || dataSource === 'local') {
-                sourceName = "本地预测";
-            } else if (dataSource === 'cache') {
-                sourceName = "缓存数据";
-            }
-            
-            // 数据核查：验证当前表格数据与中央气象台数据的一致性
-            const verificationResults = verifyDataConsistency(currentTableData, nmcData);
+            // 数据核查
+            const verificationResults = verifyDataConsistency(currentTableData, cmaData);
             const hasInconsistencies = verificationResults.some(r => r.hasIssues);
             
-            if (hasInconsistencies) {
-                console.log('发现数据不一致，自动修正中...');
-                verificationResults.forEach(r => {
-                    if (r.hasIssues) {
-                        r.issues.forEach(issue => console.warn(`${r.date}: ${issue.message}`));
-                    }
-                });
-            }
+            // 自动修正数据
+            currentTableData = autoCorrectData(currentTableData, cmaData);
             
-            // 自动修正数据：根据中央气象台数据更新并重新计算PM2.5
-            currentTableData = autoCorrectData(currentTableData, nmcData);
-            
-            console.log('修正后的数据:', currentTableData);
-
-            // 1. 刷新表格
+            // 刷新显示
             initTable();
-
-            // 2. 生成预测描述
             generateForecastDescription();
-
-            // 3. 生成长三角区域预测
             generateRegionForecast();
-
-            // 4. 刷新图表链接
             updateChartLinks();
 
-            // 更新数据时间戳
+            // 更新数据信息
             lastDataUpdateTime = new Date().toLocaleString('zh-CN', {
                 year: 'numeric',
                 month: '2-digit',
@@ -2272,54 +2277,312 @@ async function refreshAllData() {
                 hour: '2-digit',
                 minute: '2-digit'
             });
-            dataUpdateSource = sourceName;
-            
-            // 更新数据信息栏显示
+            dataUpdateSource = "中央气象台";
             updateDataInfoDisplay();
             
-            // 显示核查结果提示
-            if (hasInconsistencies) {
-                const issueCount = verificationResults.filter(r => r.hasIssues).length;
-                showToast(`已获取${sourceName}数据并自动修正${issueCount}处不一致！`, "success");
-            } else {
-                showToast(`已更新${sourceName}数据！`, "success");
-            }
+            const msg = hasInconsistencies ? 
+                `已获取中央气象台数据并自动修正！` : 
+                `已更新中央气象台数据！`;
+            showToast(msg, "success");
         } else {
-            throw new Error(result.error || '数据格式错误');
+            throw new Error('获取数据失败');
         }
 
     } catch (error) {
-        console.log('API数据获取失败，使用本地预测数据:', error.message);
-        // 静默使用本地数据，不显示错误提示
+        console.log('[ERROR] API数据获取失败:', error.message);
+        useLocalFallbackData();
+    }
+}
+
+// 【纯前端】直接从CMA API获取数据（无需后端服务器）
+async function fetchFromCMAAPI() {
+    try {
+        // 使用CORS代理或直接调用（如果API支持CORS）
+        const url = 'https://weather.cma.cn/api/weather/58352';
         
-        // 失败时使用默认数据并应用规则计算
-        currentTableData = defaultData.map((row, index) => {
-            // 应用长三角规则计算PM2.5
-            const calculatedPM25 = calculatePM25WithRules(
-                row.date,
-                yangtzeRiverDeltaRules[row.date]?.basePM25 || row.pm25,
-                row.weather,
-                row.windLevel,
-                row.rainfall
-            );
-            
-            console.log(`本地数据 ${row.date}: 基础PM25=${row.pm25}, 计算后=${calculatedPM25}`);
-            
-            return {
-                ...row,
-                pm25: calculatedPM25,
-                // 应用上午转下午风向模式
-                windDirection: getWindDirectionWithTransition(row.windDirection, index)
-            };
+        // 尝试使用JSONP或直接fetch（CMA API支持CORS）
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            // 设置CORS模式
+            mode: 'cors',
+            cache: 'no-cache'
         });
         
-        initTable();
-        generateForecastDescription();
-        generateRegionForecast();
-        updateChartLinks();
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
         
-        showToast("已加载本地预测数据", "info");
+        const data = await response.json();
+        
+        if (data.code !== 0 || !data.data || !data.data.daily) {
+            throw new Error('API返回数据格式错误');
+        }
+        
+        // 转换为内部格式
+        const weatherData = [];
+        const dailyList = data.data.daily;
+        
+        for (let i = 0; i < Math.min(dailyList.length, 7); i++) {
+            const day = dailyList[i];
+            
+            // 解析日期
+            const dateStr = day.date || '';
+            const dateFormatted = dateStr ? 
+                dateStr.replace(/\//g, '-') : 
+                formatDateOffset(i);
+            
+            // 天气和温度
+            const weather = day.dayText || '多云';
+            const tempHigh = parseInt(day.high) || 15;
+            const tempLow = parseInt(day.low) || 5;
+            
+            // 风向风力
+            let windDirection = day.dayWindDirection || '东风';
+            const windScale = day.dayWindScale || '微风';
+            const windLevel = convertWindScale(windScale);
+            
+            // 夜间风向（转换模式）
+            const nightWind = day.nightWindDirection || windDirection;
+            if (nightWind !== windDirection) {
+                windDirection = `${windDirection}转${nightWind}`;
+            }
+            
+            // 估算湿度
+            const humidity = estimateHumidity(weather, tempHigh, tempLow);
+            
+            weatherData.push({
+                date: dateFormatted,
+                weather: weather,
+                tempHigh: tempHigh,
+                tempLow: tempLow,
+                windDirection: windDirection,
+                windLevel: windLevel,
+                windSpeedMin: estimateWindSpeed(windLevel)[0],
+                windSpeedMax: estimateWindSpeed(windLevel)[1],
+                rainfall: 0,
+                humidity: humidity,
+                pm25: estimatePM25(weather, windLevel),
+                o3: 70,
+                dataSource: '中央气象台',
+                updateTime: new Date().toLocaleString('zh-CN')
+            });
+        }
+        
+        return weatherData;
+        
+    } catch (error) {
+        console.log('[ERROR] CMA API调用失败:', error.message);
+        // 如果直接调用失败，尝试使用备用方法
+        return await fetchFromCMAWithProxy();
     }
+}
+
+// 备用：使用CORS代理获取数据
+async function fetchFromCMAWithProxy() {
+    // 定义多个CORS代理，按顺序尝试
+    const corsProxies = [
+        '',  // 直接访问
+        'https://api.allorigins.win/get?url=',
+        'https://cors-anywhere.herokuapp.com/',
+    ];
+    
+    const targetUrl = 'https://weather.cma.cn/api/weather/58352';
+    
+    for (const proxy of corsProxies) {
+        try {
+            const url = proxy ? `${proxy}${encodeURIComponent(targetUrl)}` : targetUrl;
+            const response = await fetch(url, { timeout: 10000 });
+            
+            if (!response.ok) continue;
+            
+            let data;
+            if (proxy) {
+                // 代理返回的数据格式可能不同
+                const proxyData = await response.json();
+                data = proxyData.contents ? JSON.parse(proxyData.contents) : proxyData;
+            } else {
+                data = await response.json();
+            }
+            
+            if (data.code === 0 && data.data && data.data.daily) {
+                // 解析数据（同上）
+                return parseCMADailyData(data.data.daily);
+            }
+        } catch (e) {
+            console.log(`[WARN] 代理 ${proxy || '直接'} 失败:`, e.message);
+            continue;
+        }
+    }
+    
+    throw new Error('所有API调用方式都失败');
+}
+
+// 解析CMA日报数据
+function parseCMADailyData(dailyList) {
+    const weatherData = [];
+    
+    for (let i = 0; i < Math.min(dailyList.length, 7); i++) {
+        const day = dailyList[i];
+        
+        const dateStr = day.date || '';
+        const dateFormatted = dateStr ? 
+            dateStr.replace(/\//g, '-') : 
+            formatDateOffset(i);
+        
+        const weather = day.dayText || '多云';
+        const tempHigh = parseInt(day.high) || 15;
+        const tempLow = parseInt(day.low) || 5;
+        
+        let windDirection = day.dayWindDirection || '东风';
+        const windScale = day.dayWindScale || '微风';
+        const windLevel = convertWindScale(windScale);
+        
+        const nightWind = day.nightWindDirection || windDirection;
+        if (nightWind !== windDirection) {
+            windDirection = `${windDirection}转${nightWind}`;
+        }
+        
+        const humidity = estimateHumidity(weather, tempHigh, tempLow);
+        
+        weatherData.push({
+            date: dateFormatted,
+            weather: weather,
+            tempHigh: tempHigh,
+            tempLow: tempLow,
+            windDirection: windDirection,
+            windLevel: windLevel,
+            windSpeedMin: estimateWindSpeed(windLevel)[0],
+            windSpeedMax: estimateWindSpeed(windLevel)[1],
+            rainfall: 0,
+            humidity: humidity,
+            pm25: estimatePM25(weather, windLevel),
+            o3: 70,
+            dataSource: '中央气象台',
+            updateTime: new Date().toLocaleString('zh-CN')
+        });
+    }
+    
+    return weatherData;
+}
+
+// 辅助函数：转换风力等级
+function convertWindScale(scaleText) {
+    if (!scaleText) return "1-2级";
+    if (scaleText.includes('微风')) return "1-2级";
+    
+    const match = scaleText.match(/(\d+)[~\-～]*(\d*)级?/);
+    if (match) {
+        const level1 = match[1];
+        const level2 = match[2];
+        if (level2 && level2 !== level1) {
+            return `${level1}-${level2}级`;
+        } else {
+            return `${level1}级`;
+        }
+    }
+    return "1-2级";
+}
+
+// 辅助函数：估算风速
+function estimateWindSpeed(windLevel) {
+    const levelMatch = windLevel.match(/(\d+)/);
+    const level = levelMatch ? parseInt(levelMatch[1]) : 2;
+    
+    const speedRanges = {
+        1: [0.3, 1.5],
+        2: [1.6, 3.3],
+        3: [3.4, 5.4],
+        4: [5.5, 7.9],
+        5: [8.0, 10.7],
+        6: [10.8, 13.8],
+    };
+    
+    return speedRanges[level] || [1.6, 3.3];
+}
+
+// 辅助函数：估算湿度
+function estimateHumidity(weather, tempHigh, tempLow) {
+    let humidity = 60;
+    
+    if (weather.includes('雨') || weather.includes('雪')) {
+        humidity += 25;
+    } else if (weather.includes('雾') || weather.includes('霾')) {
+        humidity += 15;
+    } else if (weather.includes('阴')) {
+        humidity += 10;
+    } else if (weather.includes('多云')) {
+        humidity += 5;
+    } else if (weather.includes('晴')) {
+        humidity -= 15;
+    }
+    
+    const tempDiff = tempHigh - tempLow;
+    if (tempDiff > 10) {
+        humidity -= 5;
+    }
+    
+    return Math.max(30, Math.min(95, humidity));
+}
+
+// 辅助函数：估算PM2.5
+function estimatePM25(weather, windLevel) {
+    let pm25 = 50;
+    
+    if (weather.includes('雨') || weather.includes('雪')) {
+        pm25 -= 20;
+    } else if (weather.includes('晴')) {
+        pm25 -= 10;
+    } else if (weather.includes('雾') || weather.includes('霾')) {
+        pm25 += 30;
+    }
+    
+    const levelMatch = windLevel.match(/(\d+)/);
+    const level = levelMatch ? parseInt(levelMatch[1]) : 2;
+    
+    if (level >= 4) {
+        pm25 -= 15;
+    } else if (level <= 2) {
+        pm25 += 10;
+    }
+    
+    return Math.max(15, Math.min(150, pm25));
+}
+
+// 辅助函数：格式化日期偏移
+function formatDateOffset(days) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toISOString().split('T')[0];
+}
+
+// 使用本地数据作为后备
+function useLocalFallbackData() {
+    const defaultDataCopy = getDefaultDataCopy();
+    currentTableData = defaultDataCopy.map((row, index) => {
+        const calculatedPM25 = calculatePM25WithRules(
+            row.date,
+            yangtzeRiverDeltaRules[row.date]?.basePM25 || row.pm25,
+            row.weather,
+            row.windLevel,
+            row.rainfall
+        );
+        
+        return {
+            ...row,
+            pm25: calculatedPM25,
+            windDirection: getWindDirectionWithTransition(row.windDirection, index)
+        };
+    });
+    
+    initTable();
+    generateForecastDescription();
+    generateRegionForecast();
+    updateChartLinks();
+    
+    showToast("已加载本地预测数据", "info");
 }
 
 // 备用刷新函数（使用本地默认数据）
@@ -2368,8 +2631,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         forecastDateInput.value = dateStr;
     }
 
-    // 初始化表格数据（应用长三角规则和气象修正）
-    currentTableData = defaultData.map(row => ({
+    // 初始化表格数据（使用深拷贝，应用长三角规则和气象修正）
+    const defaultDataCopy = getDefaultDataCopy();
+    currentTableData = defaultDataCopy.map(row => ({
         ...row,
         pm25: calculatePM25WithRules(
             row.date,
@@ -2379,6 +2643,8 @@ document.addEventListener("DOMContentLoaded", async function() {
             row.rainfall
         )
     }));
+    
+    console.log('[INIT] 默认数据初始化完成:', currentTableData.map(d => ({date: d.date, weather: d.weather, wind: d.windDirection + d.windLevel})));
 
     // 初始化表格
     initTable();
